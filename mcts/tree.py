@@ -73,5 +73,7 @@ class Tree:
         return max(self.root.childrens, key=lambda element: element.total_score/element.nb_visit).action
 
 
-
+    def do_best(self, board):
+        action = max(self.root.childrens, key=lambda element: element.total_score/element.nb_visit).action
+        action.do(board=board)
     
