@@ -75,7 +75,7 @@ class Board():
 
         #print(coef_x, coef_y)
         #print(max(  y_final-y_init , x_final- x_init  ))
-        for i in range(max(  y_final-y_init , x_final- x_init  )-2):
+        for i in range(max(  y_final-y_init , x_final- x_init  )-1):
             if [x_init + (i+1)*coef_x, y_init + (i+1)*coef_y] in self.pawns[0] or [x_init + (i+1)*coef_x, y_init + (i+1)*coef_y] in self.pawns[1]: 
                 return False
         # Application
@@ -122,9 +122,8 @@ class Board():
 
                 if coef_x!=0: coef_x /= abs((x - x_ball))
                 if coef_y!=0: coef_y /=abs((y - y_ball))
-
                 collided = False
-                for i in range(max(  abs(y-y_ball) , abs(x- x_ball)  )-2):
+                for i in range(max(  abs(y-y_ball) , abs(x- x_ball)  )-1):
                     if [x_ball + (i+1)*coef_x, y_ball + (i+1)*coef_y] in self.pawns[0] or [x_ball + (i+1)*coef_x, y_ball + (i+1)*coef_y] in self.pawns[1]: 
                         collided = True
                         break
@@ -137,9 +136,9 @@ class Board():
 
     def winner(self):
         if self.balls[0][1] == HEIGHT-1:
-            return 1
-        if self.balls[1][1] == 0:
             return -1
+        if self.balls[1][1] == 0:
+            return 1
         return 0
 
     def updatePlayer(self):
