@@ -1,0 +1,6 @@
+# Visual studio code
+.vscode
+
+# Python
+__pycache__
+*.pyc
