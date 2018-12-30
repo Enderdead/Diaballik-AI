@@ -149,11 +149,14 @@ class DeepNeuronalNetwork():
         self.input_lock.release()
 
 
-    def eval(self, aa):
+    def eval(self, board, actions_boards):
+        stacked_actions = [np.dstack([board,actions_board]) for actions_board in actions_boards]
+        inputs = np.stack(stacked_actions,axis=0)
         self.input_lock.acquire()
-        res = self.tf_sess.run([self.tf_output_pos, self.tf_output_win],feed_dict={self.tf_input : aa})
+        res = self.tf_sess.run([self.tf_output_pos, self.tf_output_win],feed_dict={self.tf_input : inputs})
         self.input_lock.release()
         res[1] = res[1][0][0]
+        res[0] = res[0][0]
         return res
 
     def get_kernel(self,dumped=False):
@@ -178,5 +181,9 @@ class DeepNeuronalNetwork():
         self.tf_sess.run(self.tf_load_param,feed_dict=dict(zip(placeholders,data)))
         self.input_lock.release()
         
+    def get_score(self, board):
+        inputs = np.array([np.dstack([board,np.zeros_like(board)])])
+        res = self.tf_sess.run(self.tf_output_win, feed_dict={self.tf_input: inputs})
+        return res[0][0]
 
 
