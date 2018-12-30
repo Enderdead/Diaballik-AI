@@ -1,7 +1,8 @@
 from tkinter import * 
 from random import choice
 from mcts.tree import *
-
+from CNN.network import DeepNeuronalNetwork
+from pickle import load
 
 class Window():
     def __init__(self, board, width=600, height=600, margin=10, width_board=7, height_board=7):
@@ -46,6 +47,12 @@ class Window():
         self.state = "select"
         self.pos_selected = [-1,-1]
         self.ghost_pos = list()
+
+        self.ia = DeepNeuronalNetwork()
+        self.ia.start()
+        datas = open("./log/12-30_23:03:43-kernel.data","rb")
+        kernels = load(datas)
+        self.ia.load_kernel(kernels)
 
         self.human_player = 0
         self.root.bind("<Button 1>", self.compute_click)
@@ -135,9 +142,8 @@ class Window():
     def compute_button(self):
         if self.game.current_player!= (self.human_player+1%2):
             return
-
-        tree = Tree(self.game)
-        for _ in range(200):
+        tree =Tree(self.game, self.ia, {0:1,1:-1}[self.game.current_player])
+        for _ in range(1000):
             tree.compute()
         tree.do_best(self.game)
         self.update()
