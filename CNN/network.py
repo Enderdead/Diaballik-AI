@@ -1,6 +1,9 @@
 import tensorflow as tf 
 import numpy as np 
 from pickle import dumps, loads
+from threading import Lock
+
+# Amélioration  , connecté les positions
 
 class DeepNeuronalNetwork():
     def __init__(self):
@@ -10,6 +13,8 @@ class DeepNeuronalNetwork():
         self.tf_input = tf.placeholder(tf.float32, shape=(None, 7, 7, 4))
         # Board
         self.tf_inputBoard = self.tf_input[0:1,:,:,0:2]
+        
+        self.input_lock = Lock()
 
         with tf.name_scope("A_main"):
             self.tf_kernel_A = tf.Variable(init_kernels([4,4,4,8]),dtype=tf.float32,name="kernel_A")
@@ -96,7 +101,7 @@ class DeepNeuronalNetwork():
             self.tf_loss = tf.reduce_mean(tf.square(self.tf_winner-self.tf_output_win)) - tf.reduce_mean(self.tf_selected_play*tf.log(self.tf_output_pos))
 
         with tf.name_scope("train"):
-            self.tf_optimizer = tf.train.AdamOptimizer(learning_rate=0.01)
+            self.tf_optimizer = tf.train.AdamOptimizer(learning_rate=0.001)
             self.tf_train_op = self.tf_optimizer.minimize(self.tf_loss)
 
 
@@ -131,29 +136,39 @@ class DeepNeuronalNetwork():
         self.tf_sess = tf.Session(config=self.tf_config)
         self.tf_sess.run(self.tf_init)
 
-    def add_exemple(self, board, actions, selected_action_index, winner):
-        pass
+    def fit(self, board, actions, selected_action_index, winner):
+        self.input_lock.acquire()
+        inputs = [ np.dstack([board,action]) for action in actions ]
+        
+        indexs = np.zeros((1,len(actions)),dtype=np.float32)
+        indexs[0][selected_action_index] = 1
 
-    def fit(self):
-        pass
+        win = np.array([[winner]])
+
+        self.tf_sess.run(self.tf_train_op, feed_dict={self.tf_input: inputs,self.tf_winner: win, self.tf_selected_play: indexs})
+        self.input_lock.release()
 
 
     def eval(self, aa):
+        self.input_lock.acquire()
         res = self.tf_sess.run([self.tf_output_pos, self.tf_output_win],feed_dict={self.tf_input : aa})
+        self.input_lock.release()
         res[1] = res[1][0][0]
         return res
 
     def get_kernel(self,dumped=False):
+        self.input_lock.acquire()
         elements = list()
         for param in self.saved_param:
             elements.append(param.eval(self.tf_sess))
+        self.input_lock.release()
         if not dumped:
             return elements
-
         return dumps(elements)
 
 
     def load_kernel(self, data, dumped=False):
+        self.input_lock.acquire()
         if dumped:
             data = loads(data)
         placeholders = list()
@@ -161,6 +176,7 @@ class DeepNeuronalNetwork():
             name = param.name.split("/")[-1][:-2]
             placeholders.append(self.__getattribute__("tf_"+name+"_load"))
         self.tf_sess.run(self.tf_load_param,feed_dict=dict(zip(placeholders,data)))
+        self.input_lock.release()
         
 
 
