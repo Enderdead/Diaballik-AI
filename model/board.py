@@ -55,6 +55,10 @@ class Board():
 
 
     def moveBall(self, x_init, y_init, x_final, y_final, force=False):
+        if force:
+            self.balls[self.balls.index([x_init,y_init])] = [x_final, y_final]
+            return True
+
         # verification de la position initial
         if not [x_init, y_init] in self.balls:
             return False
@@ -166,6 +170,26 @@ class Board():
         plt.matshow(mat)
         plt.show()
 
+
+    def get_actions_board_raw(self, actions):
+        result = list()
+        for action in actions:
+            action.do(board=self, force=True)
+            result.append(self.get_board_raw())
+            action.undo(board=self)
+        return result
+
+
+    def get_board_raw(self):
+        mat_pawns = [[0 for _ in range(WIDTH)] for _ in range(HEIGHT)]
+        for team in range(2):
+            for pawn in self.pawns[team]:
+                mat_pawns[pawn[1]][pawn[0]] = team*-2 + 1  
+        mat_balls = [[0 for _ in range(WIDTH)] for _ in range(HEIGHT)]
+        for ball in self.balls:
+            mat_balls[ball[1]][ball[0]] = self.balls.index(ball)*-2 + 1
+
+        return np.dstack([np.array(mat_pawns), np.array(mat_balls)])
 
 
 if __name__ == "__main__":
