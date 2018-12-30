@@ -4,6 +4,7 @@ from learning.constant import *
 from model.board import Board
 from mcts.tree import Tree
 from pickle import dumps
+from math import exp
 from datetime import datetime
 class Client(TCPTalks):
     
@@ -46,11 +47,9 @@ class Client(TCPTalks):
 
                 print("Finish")                
                 # Last action    
-                self.send(PUSH_EXEMPLE_OPCODE, 1, history_board[-1], history_actions[-1], history_choice[-1],board.winner())
-                if current_player[-2] == current_player[-1]:
-                    self.send(PUSH_EXEMPLE_OPCODE,0.5, history_board[-2], history_actions[-2], history_choice[-2],board.winner())
-                if current_player[-3] == current_player[-1]:
-                    self.send(PUSH_EXEMPLE_OPCODE,0.2, history_board[-3], history_actions[-3], history_choice[-3],board.winner())
+                for i in range(25):
+                    if current_player[-1*(i+1)] == board.winner():
+                        self.send(PUSH_EXEMPLE_OPCODE, exp(-1*i*0.07), history_board[-1], history_actions[-1], history_choice[-1],board.winner())
 
                 save_file = open("./log-client/{}-{}.data".format( datetime.now().strftime("%m-%d_%H:%M:%S"),self.id),"wb")
                 save_file.write(dumps((history_board, history_choice, history_actions, board.winner())))
