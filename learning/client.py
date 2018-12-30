@@ -4,7 +4,7 @@ from learning.constant import *
 from model.board import Board
 from mcts.tree import Tree
 from pickle import dumps
-
+from datetime import datetime
 class Client(TCPTalks):
     
     def __init__(self, ip, port=25565, ids=None):
@@ -47,6 +47,9 @@ class Client(TCPTalks):
                 save_file = open("./log-client/{}-{}.data".format( datetime.now().strftime("%m-%d_%H:%M:%S"),self.id),"wb")
                 save_file.write(dumps((history_board, history_choice, history_actions, board.winner())))
                 save_file.close()
+                kernels = self.execute(GET_KERNEL_OPCODE)
+                self.ia.load_kernel(kernels)
+
 
         except KeyboardInterrupt:
             pass
