@@ -6,3 +6,5 @@ board = Board()
 
 win = Window(board)
 win.show()
+
+#TODO faire = 0 quand je perd
