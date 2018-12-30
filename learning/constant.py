@@ -1,0 +1,5 @@
+#!/usr/bin/python3
+
+
+GET_KERNEL_OPCODE = 0x10
+PUSH_EXEMPLE_OPCODE = 0x20
