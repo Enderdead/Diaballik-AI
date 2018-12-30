@@ -5,9 +5,10 @@ from learning.constant import *
 from threading import Thread
 from queue import Queue, Empty
 from datetime import datetime, timedelta
+from pickle import load
 
 class Master(TCPTalksServer):
-    def __init__(self, nb_clients=8):
+    def __init__(self, nb_clients=8, path=None):
         TCPTalksServer.__init__(self,NbClients=nb_clients)
         self.running = False
         self.connect_thread = None
@@ -17,6 +18,12 @@ class Master(TCPTalksServer):
 
         self.ia = DeepNeuronalNetwork()
         self.ia.start()
+        if not path is None:
+            datas = open(path,"rb")
+            kernels = load(datas)
+            self.ia.load_kernel(kernels)
+            print("Kernel loaded !")
+
         self.log_queue = Queue()
         self.get_date = lambda : datetime.now().strftime("%m-%d_%H:%M:%S")
 
@@ -39,8 +46,8 @@ class Master(TCPTalksServer):
         return self.ia.get_kernel()
 
     def _push_exemple(self, client_id, coef, board, actions, act_selected, winner):
-        self.log_queue.put("{} - Client {} put exemple : winner : {}".format(self.get_date(), client_id, winner))
-        self.ia.fit(board, actions, act_selected, winner)
+        self.log_queue.put("{} - Client {} put exemple : [winner: {}, coef: {} ]".format(self.get_date(), client_id, winner, coef))
+        self.ia.fit(board, actions, act_selected, winner, coef=coef)
 
     def wait(self):
         log_file = open("./log/syslog","a")
@@ -54,9 +61,10 @@ class Master(TCPTalksServer):
                     self.cur_save = datetime.now()
                     log_file.flush()
                 try:
-                    data = self.log_queue.get(False)
+                    data = self.log_queue.get(True, timeout=int(self.delta_save.total_seconds()*0.10)) 
                 except Empty:
                     continue
+                print(data)
                 log_file.write(data+"\n")
                 
         except KeyboardInterrupt:

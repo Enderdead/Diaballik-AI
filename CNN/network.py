@@ -1,6 +1,6 @@
 import tensorflow as tf 
 import numpy as np 
-from pickle import dumps, loads
+from pickle import dumps, load
 from threading import Lock
 
 # Amélioration  , connecté les positions
@@ -101,7 +101,8 @@ class DeepNeuronalNetwork():
             self.tf_loss = tf.reduce_mean(tf.square(self.tf_winner-self.tf_output_win)) - tf.reduce_mean(self.tf_selected_play*tf.log(self.tf_output_pos))
 
         with tf.name_scope("train"):
-            self.tf_optimizer = tf.train.AdamOptimizer(learning_rate=0.001)
+            self.tf_coef = tf.placeholder(tf.float32, shape=())
+            self.tf_optimizer = tf.train.AdamOptimizer(learning_rate=self.tf_coef*0.001)
             self.tf_train_op = self.tf_optimizer.minimize(self.tf_loss)
 
 
@@ -136,7 +137,7 @@ class DeepNeuronalNetwork():
         self.tf_sess = tf.Session(config=self.tf_config)
         self.tf_sess.run(self.tf_init)
 
-    def fit(self, board, actions, selected_action_index, winner):
+    def fit(self, board, actions, selected_action_index, winner, coef=1):
         self.input_lock.acquire()
         inputs = [ np.dstack([board,action]) for action in actions ]
         
@@ -145,7 +146,7 @@ class DeepNeuronalNetwork():
 
         win = np.array([[winner]])
 
-        self.tf_sess.run(self.tf_train_op, feed_dict={self.tf_input: inputs,self.tf_winner: win, self.tf_selected_play: indexs})
+        self.tf_sess.run(self.tf_train_op, feed_dict={self.tf_input: inputs,self.tf_winner: win, self.tf_selected_play: indexs, self.tf_coef: coef})
         self.input_lock.release()
 
 
