@@ -42,14 +42,14 @@ class Client(TCPTalks):
                     actions = board.getActions()
                     history_choice.append(actions.index(act))
                     history_actions.append(board.get_actions_board_raw(actions))
-                    current_player.append(board.current_player)
+                    current_player.append({0:1,1:-1}[board.current_player] )
                     act.do(board=board)
 
                 print("Finish")                
                 # Last action    
                 for i in range(25):
                     if current_player[-1*(i+1)] == board.winner():
-                        self.send(PUSH_EXEMPLE_OPCODE, exp(-1*i*0.07), history_board[-1], history_actions[-1], history_choice[-1],board.winner())
+                        self.send(PUSH_EXEMPLE_OPCODE, exp(-1*i*0.075), history_board[-1], history_actions[-1], history_choice[-1],board.winner())
 
                 save_file = open("./log-client/{}-{}.data".format( datetime.now().strftime("%m-%d_%H:%M:%S"),self.id),"wb")
                 save_file.write(dumps((history_board, history_choice, history_actions, board.winner())))
