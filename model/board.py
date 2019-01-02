@@ -9,14 +9,30 @@ HEIGHT = 7
 WIDTH = 7
 
 class Board():
+    """
+    Classe principal pour représenter le jeu sous la forme d'un plateau de jeu Board.
+    """
     def __init__(self):
+        """
+        Constructeur de Board, qui initialise le Board avec les positions initial du jeu.
+        """
+        # Représente les pions 
         self.pawns = [[ [x,0] for x in range(WIDTH)],\
                       [[x,HEIGHT-1] for x in range(WIDTH)]]
+        # Représente les balles
         self.balls  = [[3,0],[3,6]]
-        self.current_player = 0  
+        self.current_player = 0   # 0 = J1 et 1 = J2
         self.state = [0,0]
 
     def movePawn(self, x_init, y_init, x_final, y_final, force=False):
+        """
+        Methode pour bouger un pion.
+
+        param :
+            x_init, y_init : Position inital du pion à bouger
+            x_final, y_final : Position final du pion à bouger
+            force: Si vrai, Board ne réalise pas les vérifications pour réaliser cette action.
+        """
         if force:
             index = self.pawns[self.current_player].index([x_init,y_init])
             self.pawns[self.current_player][index] = [x_final, y_final]
@@ -55,6 +71,14 @@ class Board():
 
 
     def moveBall(self, x_init, y_init, x_final, y_final, force=False):
+        """
+        Methode pour bouger une balle.
+
+        param :
+            x_init, y_init : Position inital de la balle à bouger
+            x_final, y_final : Position final de la balle à bouger
+            force: Si vrai, Board ne réalise pas les vérifications pour réaliser cette action.
+        """
         if force:
             self.balls[self.balls.index([x_init,y_init])] = [x_final, y_final]
             return True
@@ -89,6 +113,9 @@ class Board():
 
 
     def getActions(self):
+        """
+        Retoune une liste d'Action (objet) possible pour ce tour.
+        """
         # Génération des actions movePawns
         actions = list()
         if self.state[0]<3:
@@ -139,6 +166,9 @@ class Board():
 
 
     def winner(self):
+        """
+        Retourne le gagnant du jeu (1=>J1 ; -1 => J2) ou 0 quand la partie n'est pas terminée.
+        """
         if self.balls[0][1] == HEIGHT-1:
             return -1
         if self.balls[1][1] == 0:
@@ -151,6 +181,9 @@ class Board():
             self.state = [0]
 
     def copy(self):
+        """
+        Copie l'objet (ne marche pas)
+        """
         bb = Board()
         bb.state = self.state.copy()
         bb.balls = self.balls.copy()
@@ -159,6 +192,9 @@ class Board():
         return bb
 
     def show(self):
+        """
+        Permet d'afficher le board avec la lib Matplotlib
+        """
         mat = [[0 for _ in range(WIDTH)] for _ in range(HEIGHT)]
         for team in range(2):
             for pawn in self.pawns[team]:
@@ -172,6 +208,9 @@ class Board():
 
 
     def get_actions_board_raw(self, actions):
+        """
+        Permet à partir d'une liste d'Action (Objet) de retourner les matrix d'actions associées (utilisable par le réseau de neurones).
+        """
         result = list()
         for action in actions:
             action.do(board=self, force=True)
@@ -181,6 +220,9 @@ class Board():
 
 
     def get_board_raw(self):
+        """
+        Retourne le board actuel sous la forme de matrix [7,7,2] (pion puis ball). Utilisable par le réseau de neurones.
+        """
         mat_pawns = [[0 for _ in range(WIDTH)] for _ in range(HEIGHT)]
         for team in range(2):
             for pawn in self.pawns[team]:

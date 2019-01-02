@@ -1,6 +1,6 @@
 import tensorflow as tf 
 import numpy as np 
-from pickle import dumps, load
+from pickle import dumps, loads
 from threading import Lock
 
 # Amélioration  , connecté les positions
@@ -134,10 +134,26 @@ class DeepNeuronalNetwork():
         self.tf_init = tf.global_variables_initializer()
 
     def start(self):
+        """
+            Lance une session tensorflow
+        """
         self.tf_sess = tf.Session(config=self.tf_config)
         self.tf_sess.run(self.tf_init)
 
     def fit(self, board, actions, selected_action_index, winner, coef=1):
+        """
+        Permet de faire l'apprentissage d'un exemple avec un learning rate égal à coef * 0.001 
+
+        param:
+            board : Le board courant de l'exemple. Un board est constitué de deux sous board, un pour la ball et l'autre pour les pions.
+            actions : Les actions à évaluer, sous la meme forme qu'un board.
+            selected_action_index : L'index sous la forme d'un numéro de l'action finalement choisi.
+            winner : gagnant final de la partie.
+            coef : Coef à multiplier avec le learning rate par défault.
+
+        return :
+            None
+        """
         self.input_lock.acquire()
         inputs = [ np.dstack([board,action]) for action in actions ]
         
@@ -151,6 +167,15 @@ class DeepNeuronalNetwork():
 
 
     def eval(self, board, actions_boards):
+        """
+        Fonction permettant d'évaluer les actions proposé avec le board actuel.
+
+        param :
+            board :  le board courant.
+            actions_boards: List des actions à évaluer
+        return :
+            Une liste des probabilités pour les actions données en paramètres.
+        """
         stacked_actions = [np.dstack([board,actions_board]) for actions_board in actions_boards]
         inputs = np.stack(stacked_actions,axis=0)
         self.input_lock.acquire()
@@ -161,6 +186,14 @@ class DeepNeuronalNetwork():
         return res
 
     def get_kernel(self,dumped=False):
+        """
+        Retourne les kernels du reseau.
+
+        param :
+            dumped (=false): Boolean pour savoir si le retour doit être sérialisé ou non.
+        return:
+            Soit une liste de matrix numpy si dumped=False sinon un suite d'octet contenant les poids.
+        """
         self.input_lock.acquire()
         elements = list()
         for param in self.saved_param:
@@ -172,6 +205,13 @@ class DeepNeuronalNetwork():
 
 
     def load_kernel(self, data, dumped=False):
+        """
+        Charge les kernels donnés en paramètre.
+
+        param:
+            data : une liste des kernels à charger dans le modèle.
+            dumped : False si data est une liste de matrix numpy, True si data et une suite d'octet à désérialiser.
+        """
         self.input_lock.acquire()
         if dumped:
             data = loads(data)
@@ -183,6 +223,12 @@ class DeepNeuronalNetwork():
         self.input_lock.release()
         
     def get_score(self, board):
+        """
+        Permet d'évaluer la sitation d'un board donné en paramètre.
+
+        return :
+            Un scalaire compris entre -1 et 1. Plus ce numéro est proche de 1 meilleur est la situation pour le J1, idem avec -1 pour J2.
+        """
         inputs = np.array([np.dstack([board,np.zeros_like(board)])])
         res = self.tf_sess.run(self.tf_output_win, feed_dict={self.tf_input: inputs})
         return res[0][0]
