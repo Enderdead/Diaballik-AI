@@ -1,8 +1,9 @@
 from tkinter import * 
 from random import choice
-from mcts.tree import *
+#from mcts.tree import *
 from CNN.network import DeepNeuronalNetwork
 from pickle import load
+from alpha_beta.agent import MinMaxIa
 
 class Window():
     def __init__(self, board, width=600, height=600, margin=10, width_board=7, height_board=7):
@@ -47,13 +48,13 @@ class Window():
         self.state = "select"
         self.pos_selected = [-1,-1]
         self.ghost_pos = list()
-
+        """
         self.ia = DeepNeuronalNetwork()
         self.ia.start()
         datas = open("./log/12-30_23:03:43-kernel.data","rb")
         kernels = load(datas)
         self.ia.load_kernel(kernels)
-
+        """
         self.human_player = 0
         self.root.bind("<Button 1>", self.compute_click)
 
@@ -73,7 +74,6 @@ class Window():
         y_temp = int(y*self.height_board/self.height)
         x = int( (x+1.2*x_temp)*self.width_board/self.width)
         y = int( (y+1.2*y_temp)*self.height_board/self.height)
-        print(x,y)
         if self.state == "select":
             
             if [x,y] in self.game.pawns[self.human_player]:
@@ -142,10 +142,11 @@ class Window():
     def compute_button(self):
         if self.game.current_player!= (self.human_player+1%2):
             return
-        tree =Tree(self.game, self.ia, {0:1,1:-1}[self.game.current_player])
-        for _ in range(1000):
-            tree.compute()
-        tree.do_best(self.game)
+        ia = MinMaxIa(self.game)
+        ia.compute(6)
+        ia.do_best(self.game)
+        del ia
+        self.clean_ghost()
         self.update()
         
 

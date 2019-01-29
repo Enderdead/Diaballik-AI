@@ -30,9 +30,9 @@ class Action:
             force: Boolean pour forcer l'action ou Non, (forcé permet de ne pas faire les vérifications avant application)
         """
         if board is None:
-            self.game.__getattribute__(self.type)(*(self.init_pos+self.final_pos ),force=force)
+            return self.game.__getattribute__(self.type)(*(self.init_pos+self.final_pos ),force=force)
         else:
-            board.__getattribute__(self.type)(*(self.init_pos+self.final_pos ),force=force)
+            return board.__getattribute__(self.type)(*(self.init_pos+self.final_pos ),force=force)
 
     def undo(self, board=None):
         """
@@ -45,6 +45,18 @@ class Action:
             self.game.__getattribute__(self.type)(*(self.final_pos+self.init_pos ), force=True)
         else:
             board.__getattribute__(self.type)(*(self.final_pos+self.init_pos ), force=True)
+        
+    def undo_safe(self, board=None):
+        """
+        Méthode pour annuler l'action représenter.
+
+        param :
+            board: Board à utiliser pour appliquer l'action (si None, utilisation du board par default)
+        """
+        if board is None:
+            self.game.__getattribute__("un"+self.type)(*(self.init_pos+self.final_pos ))
+        else:
+            board.__getattribute__("un"+self.type)(*(self.init_pos+self.final_pos))
         
     def __eq__(self, other):
         return self.type==other.type and self.init_pos == other.init_pos and self.final_pos==other.final_pos
