@@ -34,7 +34,8 @@ class Board():
         """
         # verification de la position initial
         if not [x_init, y_init] in self.pawns[self.current_player]:
-            print("no start on a existing pawn")
+            print("no start on a existing pawn", self.current_player)
+            raise RuntimeError()
             return False
         
         # verif du delta

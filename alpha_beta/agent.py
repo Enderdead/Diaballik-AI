@@ -67,20 +67,22 @@ def _heuristicBallcanAdvance(board, side):
         board.changePlayer()
     return result
     
-def _heuristicPawnsConnected(board, side):
-    
+#def _heuristicPawnsConnected(board, side):
+#TODO
 
 class MinMaxIa():
-    def __init__(self, init_board):
+    def __init__(self, init_board, weight=[1,1,0,0,0]):
         self.init_board = init_board
         # Le meilleur max trouvé 
         self.alpha = -inf
         # Le meilleur min trouvé 
         self.beta = +inf
         self.heuristiques = {
-         _heuristicPawnAdvance: 1,
-         _heuristicBallAdvance: 1,
-         _heuristicPawnBlocked: 0,
+         _heuristicPawnAdvance: weight[0],
+         _heuristicBallAdvance: weight[1],
+         _heuristicPawnBlocked: weight[2],
+         _heuristicBallcanMove: weight[3],
+         _heuristicBallcanAdvance: weight[4],
         }
 
     def compute(self, nb_plays):
@@ -99,7 +101,7 @@ class MinMaxIa():
             mini = min([fils.score for fils in self.root.childrens])
             cur = self.root.childrens[[fils.score for fils in self.root.childrens].index(mini)]
             cur.apply(board)
-        if board.current_player ==0:
+        else:
             mini = max([fils.score for fils in self.root.childrens])
             cur = self.root.childrens[[fils.score for fils in self.root.childrens].index(mini)]
             cur.apply(board)

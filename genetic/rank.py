@@ -5,12 +5,14 @@ from random import randint
 from multiprocessing import Process
 from model.board import Board
 from alpha_beta.agent import MinMaxIa
+from copy import deepcopy
+
 
 GET_THREAD_OPCODE = 0x11
 COMPUTE_OPCODE    = 0x12
 RETURN_OPCODE     = 0X13
 
-TREE_DEPTH = 6
+TREE_DEPTH = 4
 
 class Ranker:
     class ComputerProxy(TCPTalks):
@@ -23,8 +25,6 @@ class Ranker:
             self.send(COMPUTE_OPCODE, thread_id, first, second)
 
         def receive_data(self,  thread_id, winner, looser):
-            print("lol")
-            print(self.parent)
             self.parent.receive_data(self, thread_id, winner, looser)
 
     def __init__(self):
@@ -78,7 +78,6 @@ class Ranker:
         """
         Méthode pour les computers afin de reporter leurs résultat
         """
-        print("lol")
         self.receive_lock.acquire()
         self.ready_computers.append((computer, thread_id))
         self.epoch[-1].append(looser)
@@ -94,25 +93,54 @@ class ComputeServer(TCPTalks):
             self.thread_id = thread_id
             self.players = [p1,p2]
             self.recall = recall
-            print("mdr")
             self.proco = Process(target=self.run, args=())
             self.proco.start()
 
         def run(self):
-            print("COUCOU")
             curBoard = Board()
+            board_history = list()
+
             i = 0
-            while curBoard.winner()==-1:
+            while curBoard.winner()==-1 and i<100:
                 i+=1
                 ia = MinMaxIa(curBoard,weight= self.players[curBoard.current_player])
                 ia.compute(TREE_DEPTH)
                 ia.do_best(curBoard)
-                print(i)
+                if curBoard.pawns in [x.pawns for x in board_history]:
+                    #Parti qui stagne
+                    print("Partie qui bouge pas on arrete !")
+                    i = 101
+                board_history.insert(0,deepcopy(curBoard))
+                board_history = board_history[0:6]
+
                 del ia
-                if (i%10 )== 0:
+                """if (i%10 )== 0:
                     curBoard.show()
-            
-            self.recall(RETURN_OPCODE, self.thread_id, self.players[0], self.players[1])
+                """
+            winner = None
+            looser = None
+            if (i>=100):
+                #Match nul
+                score = 0
+                for pawn in curBoard.pawns[0]:
+                    score+= 1+pawn[1]
+                for pawn in curBoard.pawns[1]:
+                    score-= 7-pawn[1]
+
+                score += (1+curBoard.balls[0][1])*3
+                score -= (7-curBoard.balls[1][1])*3
+                curBoard.show()
+                if score>0:
+                    winner = self.players[0]
+                    looser = self.players[1]
+                else:
+                    curBoard.show()
+                    winner = self.players[1]
+                    looser = self.players[0]
+            else:
+                winner = self.players[curBoard.winner()]
+                looser = self.players[(curBoard.winner()+1)%2]
+            self.recall(RETURN_OPCODE, self.thread_id, winner, looser)
 
     def __init__(self, port=25565, password=None, nb_thread=1):
         TCPTalks.__init__(self, port=port,password=password)
@@ -125,6 +153,4 @@ class ComputeServer(TCPTalks):
         return self.nb_thread
     
     def compute(self, thread_id, first, second):
-        print("pardon ?")
         ComputeServer.Thread(thread_id, first, second, self.send)
-        print("ccoucou")

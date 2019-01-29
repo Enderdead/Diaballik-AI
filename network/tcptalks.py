@@ -260,9 +260,7 @@ class TCPTalks:
             # Make sure that the authentification was well performed
             if not self.is_authentificated:
                 raise AuthentificationError('you are not authentificated')
-                # AJOUT
-                self.parent.disconnect()
-
+                
             # Get the function or method associated with the received opcode
             try:
                 instruction = self.instructions[opcode]
