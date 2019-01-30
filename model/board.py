@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import numpy as np
 from model.action import Action
 
@@ -276,8 +276,8 @@ class Board():
             for x in range(len(mat[y])):
                 if [x,y] in self.balls:
                     mat[y][x] = mat[y][x]*2
-        plt.matshow(mat)
-        plt.show()
+        #plt.matshow(mat)
+        #plt.show()
 
 
     def get_actions_board_raw(self, actions):
