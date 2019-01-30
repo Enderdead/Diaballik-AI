@@ -21,7 +21,7 @@ class Genetic:
         else:
             self.people = people_data
             if len(self.people)<people_size:
-                for _ range(people_size-len(self.people)):
+                for _ in range(people_size-len(self.people)):
                     self.people.append(list(np.random.random(nb_param)*(MAX_WEIGHT-MIN_WEIGHT)+(MIN_WEIGHT-0)))
             self.people_size = len(self.people)
         if not data_save is None:
@@ -36,7 +36,7 @@ class Genetic:
 
     def compute(self):
         self.gen +=1
-        ranked_people = self.ranker.rank(self.people)
+        ranked_people = self.ranker.rank(self.people,limit=len(self.people)*0.2)
         # [[[1, 1, 0, -1, 0], [1, 1, 1, 1, 1], [-1, -1, 0, 0, 0], [1, 0, 1, 1, 0]], [[1, 0.5, 0, 0, 0], [1, 0.5, 1, 1, 1]], [[1, 0.5, 0, 0, -1]]]
         saved_people = list()
         # keep best 20%

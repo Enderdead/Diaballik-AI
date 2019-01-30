@@ -57,6 +57,7 @@ class Ranker:
         self.next_wave = list()
         
         while len(people)>limit:
+            print(len(people))
             # Si c'est impaire j'en enleve un, il est auto dans la prochaine vague
             if (len(people)%2!=0):
                 self.next_wave.append(people.pop(randint(0,len(people)-1)))
