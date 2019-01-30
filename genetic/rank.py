@@ -98,7 +98,6 @@ class ComputeServer(TCPTalks):
 
         def run(self):
             curBoard = Board()
-            board_history = list()
 
             i = 0
             while curBoard.winner()==-1 and i<100:
@@ -106,13 +105,6 @@ class ComputeServer(TCPTalks):
                 ia = MinMaxIa(curBoard,weight= self.players[curBoard.current_player])
                 ia.compute(TREE_DEPTH)
                 ia.do_best(curBoard)
-                if curBoard.pawns in [x.pawns for x in board_history]:
-                    #Parti qui stagne
-                    print("Partie qui bouge pas on arrete !")
-                    i = 101
-                board_history.insert(0,deepcopy(curBoard))
-                board_history = board_history[0:6]
-
                 del ia
                 """if (i%10 )== 0:
                     curBoard.show()
@@ -120,6 +112,7 @@ class ComputeServer(TCPTalks):
             winner = None
             looser = None
             if (i>=100):
+                print("Match nul")
                 #Match nul
                 score = 0
                 for pawn in curBoard.pawns[0]:
@@ -138,6 +131,7 @@ class ComputeServer(TCPTalks):
                     winner = self.players[1]
                     looser = self.players[0]
             else:
+                print("Match fini")
                 winner = self.players[curBoard.winner()]
                 looser = self.players[(curBoard.winner()+1)%2]
             self.recall(RETURN_OPCODE, self.thread_id, winner, looser)
