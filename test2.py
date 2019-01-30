@@ -15,7 +15,8 @@ r.add_computer("127.0.0.1")
 r.add_computer("192.168.12.36")
 r.add_computer("192.168.12.44")
 r.add_computer("192.168.12.38")
-
+r.add_computer("192.168.12.43")
+r.add_computer("192.168.12.39")
 print("computers addded !")
 
 gene = Genetic(r, "./log", people_data=data)
