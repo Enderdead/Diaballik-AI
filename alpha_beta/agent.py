@@ -108,10 +108,10 @@ class MinMaxIa():
                 cur.apply(board)
         except TypeError:
             if board.current_player ==1:
-                cur = self.root.childrens([fils.score for fils in self.root.childrens].index(-inf))
+                cur = self.root.childrens[[fils.score for fils in self.root.childrens].index(-inf)]
                 cur.apply(board)
             else:
-                cur = self.root.childrens([fils.score for fils in self.root.childrens].index(inf))
+                cur = self.root.childrens[[fils.score for fils in self.root.childrens].index(inf)]
                 cur.apply(board)
 
                 
