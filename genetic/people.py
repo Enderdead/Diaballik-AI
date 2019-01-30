@@ -26,8 +26,11 @@ class Genetic:
             self.people_size = len(self.people)
         if not data_save is None:
             self.people = load(data_save)
+            if len(self.people)<people_size:
+                for _ in range(people_size-len(self.people)):
+                    self.people.append(list(np.random.random(nb_param)*(MAX_WEIGHT-MIN_WEIGHT)+(MIN_WEIGHT-0)))
             self.people_size = len(self.people)
-    
+
     def save(self, people):
         file_name = "saveGen_"+str(self.gen) +"_"+ datetime.now().strftime("%m_%d_%H_%M")
         with open(join(self.save_path,file_name),"wb") as file_save:
