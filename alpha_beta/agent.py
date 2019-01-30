@@ -107,8 +107,13 @@ class MinMaxIa():
                 cur = self.root.childrens[[fils.score for fils in self.root.childrens].index(mini)]
                 cur.apply(board)
         except TypeError:
-            print([fils.score for fils in self.root.childrens])
-            
+            if board.current_player ==1:
+                cur = self.root.childrens([fils.score for fils in self.root.childrens].index(-inf))
+                cur.apply(board)
+            else:
+                cur = self.root.childrens([fils.score for fils in self.root.childrens].index(inf))
+                cur.apply(board)
+
                 
     # Méthode appelé quand c'est à J2 de jouer
     def _min(self, curBoard, parent, alpha, beta, height):
