@@ -1,4 +1,4 @@
-from pickle import dump
+from pickle import dump, load
 from random import random, shuffle
 from datetime import datetime
 from os.path import join
@@ -8,7 +8,7 @@ MAX_WEIGHT = 10
 MIN_WEIGHT =-10
 
 class Genetic:
-    def __init__(self, ranker, path, people_size=40, people_data=None, nb_param=5):
+    def __init__(self, ranker, path, people_size=160, people_data=None, nb_param=5, data_save=None):
         self.save_path = path
         self.ranker = ranker
         self.nb_param = nb_param
@@ -21,9 +21,12 @@ class Genetic:
         else:
             self.people = people_data
             self.people_size = len(self.people)
+        if not data_save is None:
+            self.people = load(data_save)
+            self.people_size = len(self.people)
     
     def save(self, people):
-        file_name = "saveGen_"+str(self.gen) + datetime.now().strftime("%m_%d_%H_%M")
+        file_name = "saveGen_"+str(self.gen) +"_"+ datetime.now().strftime("%m_%d_%H_%M")
         with open(join(self.save_path,file_name),"wb") as file_save:
             dump(people,file_save)
         
