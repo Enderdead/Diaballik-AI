@@ -1,6 +1,6 @@
 from genetic.rank import ComputeServer
 
-a = ComputeServer(nb_thread=8)
+a = ComputeServer(nb_thread=4)
 
 a.connect(timeout=1000)
 a.sleep_until_disconnected()
