@@ -106,9 +106,7 @@ class ComputeServer(TCPTalks):
                 ia.compute(TREE_DEPTH)
                 ia.do_best(curBoard)
                 del ia
-                """if (i%10 )== 0:
-                    curBoard.show()
-                """
+
             winner = None
             looser = None
             if (i>=100):
@@ -122,12 +120,10 @@ class ComputeServer(TCPTalks):
 
                 score += (1+curBoard.balls[0][1])*3
                 score -= (7-curBoard.balls[1][1])*3
-                curBoard.show()
                 if score>0:
                     winner = self.players[0]
                     looser = self.players[1]
                 else:
-                    curBoard.show()
                     winner = self.players[1]
                     looser = self.players[0]
             else:
