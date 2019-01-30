@@ -8,7 +8,7 @@ MAX_WEIGHT = 10
 MIN_WEIGHT =-10
 
 class Genetic:
-    def __init__(self, ranker, path, people_size=160, people_data=None, nb_param=5, data_save=None):
+    def __init__(self, ranker, path, people_size=80, people_data=None, nb_param=5, data_save=None):
         self.save_path = path
         self.ranker = ranker
         self.nb_param = nb_param
@@ -20,6 +20,9 @@ class Genetic:
                 self.people.append(list(np.random.random(nb_param)*(MAX_WEIGHT-MIN_WEIGHT)+(MIN_WEIGHT-0)))  
         else:
             self.people = people_data
+            if len(self.people)<people_size:
+                for _ range(people_size-len(self.people)):
+                    self.people.append(list(np.random.random(nb_param)*(MAX_WEIGHT-MIN_WEIGHT)+(MIN_WEIGHT-0)))
             self.people_size = len(self.people)
         if not data_save is None:
             self.people = load(data_save)
@@ -67,4 +70,4 @@ class Genetic:
         
         self.people = saved_people + twisted_people + random_people + muted_people
         shuffle(self.people)
-        self.save(self.people)
+        self.save(saved_people)
