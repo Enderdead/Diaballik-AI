@@ -97,14 +97,18 @@ class MinMaxIa():
 
     def do_best(self, board):
         # On fait les 1 actions
-        if board.current_player ==1:
-            mini = min([fils.score for fils in self.root.childrens])
-            cur = self.root.childrens[[fils.score for fils in self.root.childrens].index(mini)]
-            cur.apply(board)
-        else:
-            mini = max([fils.score for fils in self.root.childrens])
-            cur = self.root.childrens[[fils.score for fils in self.root.childrens].index(mini)]
-            cur.apply(board)
+        try:
+            if board.current_player ==1:
+                mini = min([fils.score for fils in self.root.childrens])
+                cur = self.root.childrens[[fils.score for fils in self.root.childrens].index(mini)]
+                cur.apply(board)
+            else:
+                mini = max([fils.score for fils in self.root.childrens])
+                cur = self.root.childrens[[fils.score for fils in self.root.childrens].index(mini)]
+                cur.apply(board)
+        except TypeError:
+            print([fils.score for fils in self.root.childrens])
+            
                 
     # Méthode appelé quand c'est à J2 de jouer
     def _min(self, curBoard, parent, alpha, beta, height):
