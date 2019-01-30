@@ -6,6 +6,7 @@ from multiprocessing import Process
 from model.board import Board
 from alpha_beta.agent import MinMaxIa
 from copy import deepcopy
+from random import shuffle
 
 
 GET_THREAD_OPCODE = 0x11
@@ -51,11 +52,11 @@ class Ranker:
             self.computers_semaphore.release()
 
 
-    def rank(self, people):
+    def rank(self, people, limit=1 ):
         self.epoch = list() # Liste de list. Chaque sous list représente les perdant de la vagues
         self.next_wave = list()
         
-        while len(people)!=1:
+        while len(people)>limit:
             # Si c'est impaire j'en enleve un, il est auto dans la prochaine vague
             if (len(people)%2!=0):
                 self.next_wave.append(people.pop(randint(0,len(people)-1)))
@@ -70,7 +71,9 @@ class Ranker:
             while len(self.computers)!=len(self.ready_computers):
                 sleep(1) # TODO changer ca !
             people = self.next_wave
+            shuffle(people)
             self.next_wave = list()
+        self.epoch.append(people)
         return self.epoch
 
 
