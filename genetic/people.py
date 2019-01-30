@@ -67,7 +67,10 @@ class Genetic:
         random_people = list()
         for _ in range(int(self.people_size*0.4)):
             random_people.append(list(np.random.random(self.nb_param)*(MAX_WEIGHT-MIN_WEIGHT)+(MIN_WEIGHT-0)))
-        
+        print("Saved people : ", len(saved_people))
+        print("Muted people : ", len(muted_people))
+        print("Twist people : ", len(twisted_people))
+        print("Rando people : ", len(random_people))
         self.people = saved_people + twisted_people + random_people + muted_people
         shuffle(self.people)
         self.save(saved_people)
