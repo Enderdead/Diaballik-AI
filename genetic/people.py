@@ -11,9 +11,11 @@ class Genetic:
     def __init__(self, ranker, path, people_size=40, people_data=None, nb_param=5):
         self.save_path = path
         self.ranker = ranker
+        self.nb_param = nb_param
         self.gen = 0
         if not people_data:
             self.people = list()
+            self.people_size  =people_size
             for _ in range(people_size):
                 self.people.append(list(np.random.random(nb_param)*(MAX_WEIGHT-MIN_WEIGHT)+(MIN_WEIGHT-0)))  
         else:
@@ -33,7 +35,7 @@ class Genetic:
         saved_people = list()
         # keep best 20%
         while len(saved_people)<(self.people_size*0.2):
-            saved_people.append(ranked_people[-1].pop)
+            saved_people.append(ranked_people[-1].pop())
             if ranked_people[-1] == list():
                 ranked_people = ranked_people[:-1]
 
@@ -57,8 +59,9 @@ class Genetic:
                     temp[i] = saved_people[second_guy]
         
         random_people = list()
-        for _ in range(self.people_size*0.4):
-            random_people.append(list(np.random.random(nb_param)*(MAX_WEIGHT-MIN_WEIGHT)+(MIN_WEIGHT-0)))
+        for _ in range(int(self.people_size*0.4)):
+            random_people.append(list(np.random.random(self.nb_param)*(MAX_WEIGHT-MIN_WEIGHT)+(MIN_WEIGHT-0)))
         
-        self.people =shuffle( saved_people + twisted_people + random_people + muted_people)
+        self.people = saved_people + twisted_people + random_people + muted_people
+        shuffle(self.people)
         self.save(self.people)
